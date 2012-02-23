@@ -44,8 +44,9 @@ function uploadFile {
 
 function reportFail {
 	report_file="${file_name}.txt"
-	echo "There was a problem creating ${file_name} at ${1} time" > "${report_file}"
+	echo "There was a problem creating ${file_name} at ${1} time" > "/tmp/${report_file}"
 	ncftpput -u ${ftp_user} -p ${ftp_pass} -p ${ftp_server} / ${report_file} 1>/dev/null 2>&1
+	rm -rf /tmp/${report_file}
 #	echo 'Report created'
 }
 
