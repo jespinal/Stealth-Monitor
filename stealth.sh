@@ -31,11 +31,6 @@ function isPresent {
 	fi
 }
 
-# Function to send generated file
-#function sendMail {
-#	mutt -s "${HOSTNAME} machine screenshot at [${subject_date}]" -a /tmp/${file_name} -c "${ccrecipient}" -- ${recipient} </dev/null 
-#}
-
 # Function to create screenshot
 function createImg {
 	import -window root -compress JPEG -strip -resize 85% -quality 75 ${file_name}
@@ -55,7 +50,7 @@ function uploadFile {
 
 function reportFail {
 	report_file="${file_name}.txt"
-	echo "There was a problem creating ${file_name} at ${1} time" > "/tmp/${report_file}"
+	echo "There was a problem creating ${file_name} at ${1} time" > "${report_file}"
 	ncftpput -u ${ftp_user} -p ${ftp_pass} -p ${ftp_server} / ${report_file} 1>/dev/null 2>&1
 	rm -rf ${report_file}
 #	echo 'Report created'
