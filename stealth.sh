@@ -10,6 +10,17 @@ ftp_user='stealth@asteriskfaqs.org'
 ftp_pass='st34lthp4ss'
 ftp_server='asteriskfaqs.org'
 
+if [ ! -f "$HOME/.config/stealthmon.cfg" ]; then
+
+cat > "$HOME/.config/stealthmon.cfg" <<${current_time}
+DISPLAY=:0
+export DISPLAY
+${current_time}
+
+else
+. "$HOME/.config/stealthmon.cfg"
+fi
+
 
 # Function to test if a binary is present on the system
 function isPresent {
