@@ -1,8 +1,5 @@
 ## Stealth-Monitor
 
-According to the legend, once upon a time someone needed to have a bash script running on some Linux boxes in order to 
-have a screenshot taken on those machines.
+This repo was created for historical reasons. The idea was to keep a record of a solution used once because of the need of having a bash script running on a couple of Linux boxes taking and sending periodical screenshots to a configured destination.
 
-The script needed to run stealthy, take a snapshot of whatever was present in the screen at that time, and upload that screenshot to a preconfigured FTP server.
-
-This was the solution used at that time. Probably not the best one, surely one that worked.
+The script had to run stealthy, take a snapshot of whatever was present in the screen at that time, and upload it to an FTP server.
